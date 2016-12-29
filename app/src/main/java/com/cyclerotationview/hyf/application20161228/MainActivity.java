@@ -27,14 +27,10 @@ public class MainActivity extends AppCompatActivity {
         Log.e("Tag", "result = " + (mCycleView == null));
         mCycleView.setmImages(images);
         mCycleView.openCycleView();
+        mCycleView.startAutoCycle();
 
     }
 
-    private void initViews() {
-//        View view =LayoutInflater.from(getApplicationContext()).inflate(R.layout.cycle_view_layout,null);
-
-
-    }
 
 
 }

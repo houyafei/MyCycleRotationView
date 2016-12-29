@@ -1,6 +1,7 @@
 package com.cyclerotationview.hyf.application20161228;
 
 import android.content.Context;
+import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
@@ -57,6 +58,11 @@ public class CycleRotationView extends RelativeLayout {
     private static int pointWidth = 20 ;
     private static int pointheight = 20 ;
 
+    /*
+    * 异步线程
+    * */
+    private Handler mHandler;
+
     public CycleRotationView(Context context) {
         super(context);
 
@@ -65,7 +71,7 @@ public class CycleRotationView extends RelativeLayout {
     public CycleRotationView(Context context, AttributeSet attrs) {
         super(context,attrs);
         mContext = context ;
-
+        mHandler = new Handler();
         initView(context);
     }
 
@@ -89,17 +95,17 @@ public class CycleRotationView extends RelativeLayout {
         if(mViewPager==null) return;
         mViewPager.setAdapter(new CycleAdapter());
 
-        mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
+        mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 super.onPageScrolled(position, positionOffset, positionOffsetPixels);
             }
 
-            int lastPosition = 0 ;
+            int lastPosition = 0;
 
             @Override
             public void onPageSelected(int position) {
-                position = position%mImageViewsList.size();
+                position = position % mImageViewsList.size();
 
                 mLinearlayout.getChildAt(position).setSelected(true);
 
@@ -164,6 +170,11 @@ public class CycleRotationView extends RelativeLayout {
         this.mImages = mImages;
     }
 
+    public void startAutoCycle(){
+        if(mImages==null||
+                mContext==null) return ;
+        timerTask() ;
+    }
     /*
     * initial the views
     * */
@@ -177,7 +188,30 @@ public class CycleRotationView extends RelativeLayout {
 
         mLinearlayout = (LinearLayout) view.findViewById(R.id.id_layout_point);
     }
+    /**
+     * 定时任务
+     */
+    private void timerTask() {
 
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                int currentItem = mViewPager.getCurrentItem();
+
+                if(currentItem==mViewPager.getAdapter().getCount()-1){
+                    mViewPager.setCurrentItem(1);
+
+                }else{
+                    mViewPager.setCurrentItem(currentItem+1);
+                }
+
+                mHandler.postDelayed(this,3000);
+                // 不断给自己发消息
+               // mHandler.postDelayed(this, 3000);
+            }
+        }, 3000);
+    }
 
     private class CycleAdapter extends PagerAdapter{
 
